@@ -121,25 +121,29 @@ function initAuth() {
 }
 
 async function fetchBalance() {
+  console.log('[MYOL] fetchBalance called, key:', apiKey ? apiKey.slice(0,8)+'…' : 'null');
   try {
     const res = await fetch(BALANCE_API, { headers: { 'Authorization': `Bearer ${apiKey}` } });
+    console.log('[MYOL] balance status:', res.status);
     const label = document.getElementById('balanceLabel');
-    if (!label) return;
+    if (!label) { console.log('[MYOL] balanceLabel not found'); return; }
     if (res.status === 403) {
-      label.innerHTML = '<span style="color:#f59e0b;font-size:0.7rem;cursor:pointer" title="Reconnect to grant balance permission" onclick="connectPollinations()">⚠ reconnect for balance</span>';
+      label.innerHTML = '<span style="color:#f59e0b;font-size:0.7rem;cursor:pointer" title="Reconnect to grant balance permission" onclick="connectPollinations()">⚠ reconnect</span>';
       return;
     }
-    if (!res.ok) return;
-    const data = await res.json();
-    console.log('[MYOL] balance response:', JSON.stringify(data));
+    if (!res.ok) {
+      const txt = await res.text();
+      console.log('[MYOL] balance non-ok:', res.status, txt);
+      label.textContent = `⚠ ${res.status}`;
+      return;
+    }
+    const raw = await res.text();
+    console.log('[MYOL] balance raw:', raw);
+    const data = JSON.parse(raw);
     const bal  = typeof data === 'number' ? data
-      : (data.balance ?? data.pollen ?? data.credits ?? data.amount ?? parseFloat(JSON.stringify(data)));
-    if (bal === null || isNaN(bal)) {
-      label.textContent = `🌸 ${JSON.stringify(data)}`;
-      return;
-    }
-    label.textContent = `🌸 ${Number(bal).toFixed(2)}`;
-  } catch (e) { console.log('[MYOL] balance error:', e); }
+      : (data.balance ?? data.pollen ?? data.credits ?? data.amount ?? parseFloat(raw));
+    label.textContent = (bal !== null && !isNaN(bal)) ? `🌸 ${Number(bal).toFixed(2)}` : `🌸 ${raw}`;
+  } catch (e) { console.log('[MYOL] balance error:', e.message); }
 }
 
 function renderAuthState() {
