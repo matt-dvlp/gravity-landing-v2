@@ -157,7 +157,7 @@ async function fetchBalance() {
     const data = JSON.parse(raw);
     const bal  = typeof data === 'number' ? data
       : (data.balance ?? data.pollen ?? data.credits ?? data.amount ?? parseFloat(raw));
-    label.textContent = (bal !== null && !isNaN(bal)) ? `🌸 ${Number(bal).toFixed(2)}` : `🌸 ${raw}`;
+    label.textContent = (bal !== null && !isNaN(bal)) ? `🌸 ${Number(bal).toFixed(3)}` : `🌸 ${raw}`;
   } catch (e) { log('balance error', e.message); }
 }
 
@@ -479,6 +479,7 @@ ${getTemplateInstructions(formData.template.key, hasImages)}`;
 - NO external CDN links
 - Output ONLY the complete HTML`;
 
+  log('text API request', { url: CHAT_API, model: 'openai', promptLength: prompt.length });
   const res = await fetch(CHAT_API, {
     method: 'POST',
     headers: {
@@ -494,7 +495,12 @@ ${getTemplateInstructions(formData.template.key, hasImages)}`;
       ]
     })
   });
-  if (!res.ok) throw new Error(`Text API ${res.status}`);
+  log('text API status', res.status);
+  if (!res.ok) {
+    const errBody = await res.text();
+    log('text API error body', errBody);
+    throw new Error(`Text API ${res.status}: ${errBody.slice(0, 120)}`);
+  }
   const json = await res.json();
   let html = json?.choices?.[0]?.message?.content || '';
   if (!html) throw new Error('Empty response from text API.');
