@@ -1,0 +1,30 @@
+# Config & secrets
+includes/config.php
+.env
+*.key
+myKeys.txt
+
+# Database
+data/db.sqlite
+data/db.sqlite-shm
+data/db.sqlite-wal
+
+# Generated templates
+data/library/
+
+# Logs
+*.log
+error.log
+ai_responses.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.sublime-*
+
+# Node (if added later)
+node_modules/
