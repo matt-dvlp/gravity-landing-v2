@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MYOL — Make Your Own Landing</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="builder.css" />
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="header-left">
+      <span class="logo">MYOL</span>
+      <span class="logo-sub">Make Your Own Landing</span>
+    </div>
+    <div id="authBadge" class="auth-badge disconnected">
+      <span class="auth-dot"></span>
+      <span class="auth-label">Not connected</span>
+    </div>
+  </header>
+
+  <main class="layout">
+
+    <!-- ── LEFT: Form ───────────────────────────────── -->
+    <aside class="sidebar">
+
+      <!-- Connect -->
+      <div class="card" id="connectCard">
+        <div class="card-title">
+          <span class="step-num">1</span> Connect
+        </div>
+        <button id="connectBtn" class="btn-connect">🌸 Connect with Pollinations</button>
+        <p class="hint">Your Pollinations account pays for generation — <a href="https://pollinations.ai" target="_blank" rel="noopener">free to sign up</a>.</p>
+      </div>
+
+      <!-- Business Details -->
+      <div class="card">
+        <div class="card-title"><span class="step-num">2</span> Your Business</div>
+
+        <div class="field">
+          <label for="businessName">Business Name <span class="req">*</span></label>
+          <input type="text" id="businessName" placeholder="e.g. Aurora Yoga Studio" maxlength="60" autocomplete="off" />
+          <div class="field-err" id="nameErr"></div>
+        </div>
+
+        <div class="field">
+          <label for="tagline">Tagline</label>
+          <input type="text" id="tagline" placeholder="e.g. Find your inner balance" maxlength="120" autocomplete="off" />
+          <div class="field-err" id="taglineErr"></div>
+        </div>
+
+        <div class="field">
+          <label for="description">Description</label>
+          <textarea id="description" rows="3" placeholder="Describe your business, product, or service…" maxlength="600"></textarea>
+          <div class="field-err" id="descErr"></div>
+        </div>
+
+        <div class="field">
+          <label for="contactEmail">Contact Email</label>
+          <input type="email" id="contactEmail" placeholder="hello@yourbusiness.com" autocomplete="off" />
+          <div class="field-err" id="emailErr"></div>
+        </div>
+      </div>
+
+      <!-- Template Type -->
+      <div class="card">
+        <div class="card-title"><span class="step-num">3</span> Template</div>
+        <div class="template-grid" id="templateGrid"></div>
+      </div>
+
+      <!-- Design Style -->
+      <div class="card">
+        <div class="card-title"><span class="step-num">4</span> Design Style</div>
+        <div class="pill-group" id="stylePills"></div>
+      </div>
+
+      <!-- Color Palette -->
+      <div class="card">
+        <div class="card-title"><span class="step-num">5</span> Color Palette</div>
+        <div class="palette-group" id="paletteGrid"></div>
+      </div>
+
+      <!-- Image Settings -->
+      <div class="card">
+        <div class="card-title"><span class="step-num">6</span> Images</div>
+        <label class="toggle-row">
+          <span>Generate AI images</span>
+          <span class="toggle-wrap">
+            <input type="checkbox" id="enableImages" checked />
+            <span class="slider"></span>
+          </span>
+        </label>
+        <div id="modelWrap">
+          <div class="field-label">Image model</div>
+          <div class="pill-group" id="modelPills"></div>
+        </div>
+      </div>
+
+      <!-- Generate -->
+      <div class="generate-wrap">
+        <button id="generateBtn" class="btn-generate" disabled>✦ Generate Landing Page</button>
+        <p class="generate-hint" id="generateHint">Connect with Pollinations to start</p>
+      </div>
+
+    </aside>
+
+    <!-- ── RIGHT: Result ─────────────────────────────── -->
+    <section class="result-panel">
+
+      <!-- Empty state -->
+      <div class="result-empty" id="resultEmpty">
+        <div class="empty-icon">🚀</div>
+        <p>Fill in your details<br/>and hit <strong>Generate</strong></p>
+      </div>
+
+      <!-- Progress -->
+      <div class="progress-wrap" id="progressWrap" hidden>
+        <div class="progress-label" id="progressLabel">Starting…</div>
+        <div class="progress-track">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="progress-steps" id="progressSteps"></div>
+      </div>
+
+      <!-- Result -->
+      <div class="result-content" id="resultContent" hidden>
+        <div class="result-toolbar">
+          <span class="result-title" id="resultTitle">Your Landing Page</span>
+          <div class="result-actions">
+            <button id="regenBtn" class="btn-sm">🔄 Regenerate</button>
+            <button id="downloadBtn" class="btn-sm btn-primary">⬇ Download HTML</button>
+          </div>
+        </div>
+        <iframe id="previewFrame" sandbox="allow-scripts allow-same-origin"></iframe>
+      </div>
+
+    </section>
+
+  </main>
+
+  <script src="builder.js"></script>
+</body>
+</html>
