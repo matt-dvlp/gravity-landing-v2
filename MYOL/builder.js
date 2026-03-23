@@ -123,12 +123,17 @@ function initAuth() {
 async function fetchBalance() {
   try {
     const res = await fetch(BALANCE_API, { headers: { 'Authorization': `Bearer ${apiKey}` } });
+    const label = document.getElementById('balanceLabel');
+    if (!label) return;
+    if (res.status === 403) {
+      label.innerHTML = '<span style="color:#f59e0b;font-size:0.7rem;cursor:pointer" title="Reconnect to grant balance permission" onclick="connectPollinations()">⚠ reconnect for balance</span>';
+      return;
+    }
     if (!res.ok) return;
     const data = await res.json();
     const bal  = typeof data === 'number' ? data : (data.balance ?? data.pollen ?? null);
     if (bal === null) return;
-    const label = document.getElementById('balanceLabel');
-    if (label) label.textContent = `🌸 ${Number(bal).toFixed(2)} pollen`;
+    label.textContent = `🌸 ${Number(bal).toFixed(2)} pollen`;
   } catch { /* silent */ }
 }
 
@@ -159,7 +164,10 @@ function renderAuthState() {
 }
 
 function connectPollinations() {
-  const params = new URLSearchParams({ redirect_url: location.href });
+  const params = new URLSearchParams({
+    redirect_url: location.href,
+    permissions:  'balance'
+  });
   window.location.href = `${POLLINATIONS_AUTH}?${params}`;
 }
 
