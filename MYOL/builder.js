@@ -1,6 +1,7 @@
 // ── Constants ─────────────────────────────────────────────────────
 const POLLINATIONS_AUTH = 'https://enter.pollinations.ai/authorize';
-const TEXT_API          = 'https://gen.pollinations.ai/text/';
+const CHAT_API          = 'https://gen.pollinations.ai/v1/chat/completions';
+const BALANCE_API       = 'https://gen.pollinations.ai/account/balance';
 const IMAGE_API         = 'https://gen.pollinations.ai/image/';
 const LS_KEY            = 'myol_pollinations_key';
 
@@ -119,10 +120,23 @@ function initAuth() {
   renderAuthState();
 }
 
+async function fetchBalance() {
+  try {
+    const res = await fetch(BALANCE_API, { headers: { 'Authorization': `Bearer ${apiKey}` } });
+    if (!res.ok) return;
+    const data = await res.json();
+    const bal  = typeof data === 'number' ? data : (data.balance ?? data.pollen ?? null);
+    if (bal === null) return;
+    const label = document.getElementById('balanceLabel');
+    if (label) label.textContent = `🌸 ${Number(bal).toFixed(2)} pollen`;
+  } catch { /* silent */ }
+}
+
 function renderAuthState() {
   if (apiKey) {
     authBadge.className = 'auth-badge connected';
-    authBadge.innerHTML = '<span class="auth-dot"></span><span class="auth-label">Connected</span>';
+    authBadge.innerHTML = '<span class="auth-dot"></span><span class="auth-label">Connected</span><span class="auth-sep">·</span><span id="balanceLabel" class="balance-label">🌸 …</span>';
+    fetchBalance();
     connectCard.innerHTML = `
       <div class="card-title"><span class="step-num">1</span> Connect</div>
       <div style="display:flex;align-items:center;justify-content:space-between;">
@@ -433,16 +447,25 @@ ${getTemplateInstructions(formData.template.key, hasImages)}`;
 - NO external CDN links
 - Output ONLY the complete HTML`;
 
-  const fullPrompt = 'OUTPUT ONLY RAW HTML CODE. NO EXPLANATIONS. NO MARKDOWN.\n\n' + prompt;
-  const url = TEXT_API + encodeURIComponent(fullPrompt)
-    + '?model=gemini-fast'
-    + '&system=' + encodeURIComponent(system)
-    + '&seed=' + Math.floor(Math.random() * 999999)
-    + '&key=' + apiKey;
-
-  const res = await fetch(url, { headers: { 'Authorization': `Bearer ${apiKey}` } });
+  const res = await fetch(CHAT_API, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      model: 'openai',
+      seed:  Math.floor(Math.random() * 999999),
+      messages: [
+        { role: 'system', content: system },
+        { role: 'user',   content: 'OUTPUT ONLY RAW HTML CODE. NO EXPLANATIONS. NO MARKDOWN.\n\n' + prompt }
+      ]
+    })
+  });
   if (!res.ok) throw new Error(`Text API ${res.status}`);
-  let html = await res.text();
+  const json = await res.json();
+  let html = json?.choices?.[0]?.message?.content || '';
+  if (!html) throw new Error('Empty response from text API.');
 
   // Strip markdown fences if any
   html = html.replace(/^```(?:html)?\s*\n?/im, '').replace(/\n?```\s*$/im, '').trim();
