@@ -131,10 +131,15 @@ async function fetchBalance() {
     }
     if (!res.ok) return;
     const data = await res.json();
-    const bal  = typeof data === 'number' ? data : (data.balance ?? data.pollen ?? null);
-    if (bal === null) return;
-    label.textContent = `🌸 ${Number(bal).toFixed(2)} pollen`;
-  } catch { /* silent */ }
+    console.log('[MYOL] balance response:', JSON.stringify(data));
+    const bal  = typeof data === 'number' ? data
+      : (data.balance ?? data.pollen ?? data.credits ?? data.amount ?? parseFloat(JSON.stringify(data)));
+    if (bal === null || isNaN(bal)) {
+      label.textContent = `🌸 ${JSON.stringify(data)}`;
+      return;
+    }
+    label.textContent = `🌸 ${Number(bal).toFixed(2)}`;
+  } catch (e) { console.log('[MYOL] balance error:', e); }
 }
 
 function renderAuthState() {
