@@ -1,3 +1,18 @@
+// ── Logger ────────────────────────────────────────────────────────
+const LOG = [];
+function log(label, data) {
+  const entry = `[${new Date().toISOString()}] ${label}\n${typeof data === 'string' ? data : JSON.stringify(data, null, 2)}\n`;
+  LOG.push(entry);
+  console.log('[MYOL]', label, data);
+}
+function downloadLog() {
+  const blob = new Blob([LOG.join('\n---\n')], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'myol-debug.log';
+  a.click();
+}
+
 // ── Constants ─────────────────────────────────────────────────────
 const POLLINATIONS_AUTH = 'https://enter.pollinations.ai/authorize';
 const CHAT_API          = 'https://gen.pollinations.ai/v1/chat/completions';
@@ -121,29 +136,29 @@ function initAuth() {
 }
 
 async function fetchBalance() {
-  console.log('[MYOL] fetchBalance called, key:', apiKey ? apiKey.slice(0,8)+'…' : 'null');
+  log('fetchBalance called', { key: apiKey ? apiKey.slice(0,8)+'…' : 'null' });
   try {
     const res = await fetch(BALANCE_API, { headers: { 'Authorization': `Bearer ${apiKey}` } });
-    console.log('[MYOL] balance status:', res.status);
+    log('balance status', res.status);
     const label = document.getElementById('balanceLabel');
-    if (!label) { console.log('[MYOL] balanceLabel not found'); return; }
+    if (!label) { log('balanceLabel not found', ''); return; }
     if (res.status === 403) {
       label.innerHTML = '<span style="color:#f59e0b;font-size:0.7rem;cursor:pointer" title="Reconnect to grant balance permission" onclick="connectPollinations()">⚠ reconnect</span>';
       return;
     }
     if (!res.ok) {
       const txt = await res.text();
-      console.log('[MYOL] balance non-ok:', res.status, txt);
+      log('balance non-ok', { status: res.status, body: txt });
       label.textContent = `⚠ ${res.status}`;
       return;
     }
     const raw = await res.text();
-    console.log('[MYOL] balance raw:', raw);
+    log('balance raw', raw);
     const data = JSON.parse(raw);
     const bal  = typeof data === 'number' ? data
       : (data.balance ?? data.pollen ?? data.credits ?? data.amount ?? parseFloat(raw));
     label.textContent = (bal !== null && !isNaN(bal)) ? `🌸 ${Number(bal).toFixed(2)}` : `🌸 ${raw}`;
-  } catch (e) { console.log('[MYOL] balance error:', e.message); }
+  } catch (e) { log('balance error', e.message); }
 }
 
 function renderAuthState() {

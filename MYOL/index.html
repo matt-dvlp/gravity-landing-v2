@@ -6,7 +6,7 @@
   <title>MYOL — Make Your Own Landing</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="builder.css" />
+  <link rel="stylesheet" href="builder.css?v=3" />
 </head>
 <body>
 
@@ -15,6 +15,7 @@
       <span class="logo">MYOL</span>
       <span class="logo-sub">Make Your Own Landing!!!</span>
     </div>
+    <button onclick="downloadLog()" style="background:none;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.3);font-family:inherit;font-size:0.7rem;padding:0.25rem 0.6rem;border-radius:6px;cursor:pointer;" title="Download debug log">📋 log</button>
     <div id="authBadge" class="auth-badge disconnected">
       <span class="auth-dot"></span>
       <span class="auth-label">Not connected</span>
@@ -140,6 +141,6 @@
 
   </main>
 
-  <script src="builder.js"></script>
+  <script src="builder.js?v=3"></script>
 </body>
 </html>
